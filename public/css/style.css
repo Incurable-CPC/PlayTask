@@ -1,0 +1,9 @@
+#content {
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    position: relative;
+    word-wrap: break-word;
+    width: 500px;
+    font-family: "Comic Sans MS", serif;
+}
