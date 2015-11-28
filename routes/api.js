@@ -9,7 +9,6 @@ var User = mongoose.model('User');
 var Task = mongoose.model('Task');
 
 function checkLogin(req, res, next) {
-  console.log(req.signedCookies);
   if (req.session.user) {
     return next();
   } else if (req.signedCookies.user) {
