@@ -175,7 +175,7 @@ const Task = React.createClass({
           workTask={this.workTask} />
         <TaskNewButton
           type={this.props.type}
-          onClick={this.showEditModal.bind(this, 'new')}
+          showEditModal={this.showEditModal.bind(this, 'new')}
           onUpdate={this.loadFromServer}
         />
       </div>
@@ -293,13 +293,17 @@ const TaskNewButton = React.createClass({
   componentDidUpdate: function() {
     this.props.onUpdate();
   },
+  onClick: function() {
+    var defaultTask = {type: this.props.type};
+    this.props.showEditModal(defaultTask);
+  },
   render: function () {
     return (
       <div className="text-right">
         <button
           type="button"
           className="btn btn-primary"
-          onClick={this.props.onClick.bind(null, {type: this.props.type})}>
+          onClick={this.onClick}>
           New Task </button>
       </div>
     );
