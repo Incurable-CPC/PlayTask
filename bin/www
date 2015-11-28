@@ -25,7 +25,8 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-mongoose.connect('mongodb://localhost/playTask', function(err) {
+var settings = require('../settings');
+mongoose.connect('mongodb://localhost/'+settings.db, function(err) {
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListening);

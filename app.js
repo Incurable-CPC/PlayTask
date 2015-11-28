@@ -20,11 +20,23 @@ app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+var settings = require('./settings');
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser(settings.cookieSecret));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: settings.cookieSecret,
+  store: new MongoStore({
+    db: settings.db
+  }),
+  resave: true,
+  saveUninitialized: true
+}));
 
 app.use('/', routes);
 app.use('/api', api);

@@ -1,4 +1,6 @@
 #content {
+    padding-top: 50px;
+    padding-bottom: 50px;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
@@ -6,4 +8,9 @@
     word-wrap: break-word;
     width: 500px;
     font-family: "Comic Sans MS", serif;
+}
+
+.form-login {
+    padding-left: 100px;
+    padding-right: 100px;
 }

@@ -1,8 +1,3 @@
-function nameStr(name) {
-  return name.substr(0, 1).toUpperCase().concat(name.substr(1));
-}
-const emptyUrl = 'javascript: void(0)';
-
 const Content = React.createClass({
   getInitialState: function() {
     return {
@@ -50,7 +45,6 @@ const Content = React.createClass({
           content={this.state.content}
           onClick={this.handleOnClick} />
         {content}
-        <br /><br /><br /><br />
       </div>
     );
   }
@@ -244,15 +238,15 @@ const TaskEdit = React.createClass({
             </div>
             <div className="modal-body">
               <form>
-                <Input
+                <TextInput
                   name="description"
                   default={task? task.description: ''}
                   onChange={this.props.onChange.bind(null, 'description')}/>
-                <Input
+                <TextInput
                   name="points"
                   default={task? task.points: ''}
                   onChange={this.props.onChange.bind(null, 'points')}/>
-                <Input
+                <TextInput
                   name="amount"
                   default={task? task.amount: ''}
                   onChange={this.props.onChange.bind(null, 'amount')}/>
@@ -426,11 +420,11 @@ const DesireEdit = React.createClass({
             </div>
             <div className="modal-body">
               <form>
-                <Input
+                <TextInput
                   name="description"
                   default={desire? desire.description: ''}
                   onChange={this.props.onChange.bind(null, 'description')}/>
-                <Input
+                <TextInput
                   name="points"
                   default={desire? desire.points: ''}
                   onChange={this.props.onChange.bind(null, 'points')}/>
@@ -592,42 +586,6 @@ const EventView = React.createClass({
           </div>
         </div>
       </div>
-    );
-  }
-});
-
-const Input = React.createClass({
-  render: function() {
-    var name = this.props.name;
-    return (
-      <input
-        className="form-control"
-        type="text"
-        name={name}
-        placeholder={nameStr(name)}
-        value={this.props.default}
-        onChange={this.props.onChange} />
-    );
-  }
-});
-const Select = React.createClass({
-  render: function() {
-    var name=this.props.name;
-    var options = this.props.options.map(function(option) {
-      return (
-        <option
-          key={option.value}
-          value={option.value}>
-          {option.text}</option>
-      );
-    }, this);
-    return (
-      <select
-        className="form-control"
-        onChange={this.props.onChange}
-        value={this.props.default}
-        name={name}
-      >{options}</select>
     );
   }
 });
