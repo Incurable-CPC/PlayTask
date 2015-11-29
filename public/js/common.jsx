@@ -39,7 +39,6 @@ const Input = React.createClass({
       </div>
     );
   }
-
 });
 window.TextInput = React.createClass({
   render: function() {
@@ -49,6 +48,80 @@ window.TextInput = React.createClass({
 window.PasswordInput = React.createClass({
   render: function() {
     return <Input {...this.props} type="password"/>;
+  }
+});
+window.FileInput = React.createClass({
+  getInitialState: function() {
+    return {
+      fileInfo: ''
+    };
+  },
+  handleChange: function(evt) {
+    var label = evt.target.value.replace(/\\/g, '/').replace(/.*\//, '');
+    this.setState({fileInfo: label});
+    this.props.onChange(evt.target.files);
+  },
+  render: function() {
+    var name = this.props.name;
+    return (
+      <div className="input-group">
+					<span className="input-group-btn">
+						<span className="btn btn-default btn-file">
+              Browse
+              <input
+                type="file"
+                name={name}
+                id={name+'-input'}
+                accept={this.props.accept}
+                onChange={this.handleChange}/>
+            </span>
+          </span>
+        <input
+          type="text"
+          className="form-control"
+          value={this.state.fileInfo}
+          readOnly/>
+      </div>
+    );
+  }
+});
+window.MultiFileInput = React.createClass({
+  getInitialState: function() {
+    return {
+      fileInfo: ''
+    };
+  },
+  handleChange: function(evt) {
+    var input = evt.target;
+    var numFiles = input.files? input.files.length: 1;
+    var label = input.value.replace(/\\/g, '/').replace(/.*\//, '');
+    var log = (numFiles > 1)? numFiles+'files selected': label;
+    this.setState({fileInfo: log});
+    this.props.onChange(evt.target.files);
+  },
+  render: function() {
+    var name = this.props.name;
+    return (
+      <div className="input-group">
+					<span className="input-group-btn">
+						<span className="btn btn-default btn-file">
+              Browse
+              <input
+                type="file"
+                name={name}
+                id={name+'-input'}
+                accept={this.props.accept}
+                onChange={this.handleChange}
+                multiple/>
+            </span>
+          </span>
+        <input
+          type="text"
+          className="form-control"
+          value={this.state.fileInfo}
+          readOnly/>
+      </div>
+    );
   }
 });
 window.Select = React.createClass({

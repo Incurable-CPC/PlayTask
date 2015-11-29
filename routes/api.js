@@ -5,6 +5,11 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var multer = require('multer');
+var upload = multer({dest: 'tmp/'});
+var path = require('path');
+var fs = require('fs');
+
 var User = mongoose.model('User');
 var Task = mongoose.model('Task');
 
@@ -18,7 +23,7 @@ function checkLogin(req, res, next) {
   res.send({});
 }
 
-router.get('/', checkLogin);
+router.get('/*', checkLogin);
 router.get('/achievement/get', function(req, res, next) {
   User.findOne({username: req.session.user}, function(err, user) {
     if (err) return next(err);
@@ -137,6 +142,47 @@ router.post('/event/remove', function(req, res, next) {
     user.removeEvent(event, function(err, user) {
       if (err) return next(err);
       res.send(event);
+    });
+  });
+});
+
+router.get('/user/get', function(req, res, next) {
+  User.findOne({username: req.session.user}, function (err, user) {
+    if (err) return next(err);
+    res.send({
+      nickname: user.nickname,
+      image: user.image
+    })
+  });
+});
+router.post('/user/picture/update', upload.single('image'), function(req, res, next) {
+  var image = req.file;
+  fs.readFile(image.path, function(err, data) {
+    if (err) return next(err);
+    var newPath = path.join('public', 'img', image.filename);
+    fs.writeFile(newPath, data, function(err) {
+      if (err) return next(err);
+      fs.unlink(image.path);
+      User.findOneAndUpdate({username: req.session.user}, {
+        $set: { image: image.filename}
+      }, function(err) {
+        if (err) return next(err);
+        res.send({
+          success: true,
+          successMessage: 'Upload success'
+        });
+      });
+    });
+  });
+});
+router.post('/user/nickname/edit', function(req, res, next) {
+  var nickname = req.body.nickname;
+  User.findOneAndUpdate({username: req.session.user}, {
+    $set: { nickname: nickname}
+  }, function(err) {
+    if (err) return next(err);
+    res.send({
+      success: true
     });
   });
 });

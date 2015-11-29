@@ -39,24 +39,12 @@ const Content = React.createClass({
     }
     return (
       <div className="content">
-        <Achievement achievement={this.state.achievement}/>
+        <User achievement={this.state.achievement}/>
         <TabList
           type={this.state.type}
           content={this.state.content}
           onClick={this.handleOnClick} />
         {content}
-      </div>
-    );
-  }
-});
-
-const Achievement = React.createClass({
-  render: function() {
-    var achievement = this.props.achievement;
-    var state = (achievement >= 0)? 'success': 'danger';
-    return (
-      <div className={'text-center alert alert-'+state}>
-        <strong>Achievement: {this.props.achievement}</strong>
       </div>
     );
   }
@@ -168,7 +156,7 @@ const Task = React.createClass({
         <TaskList
           taskList={this.state.taskList}
           onClick={this.showEditModal.bind(this, 'edit')}/>
-        <TaskEdit
+        <TaskEditModal
           action={this.state.action}
           task={this.state.taskEditing}
           onChange={this.handleChange}
@@ -221,7 +209,7 @@ const TaskNode = React.createClass({
     );
   }
 });
-const TaskEdit = React.createClass({
+const TaskEditModal = React.createClass({
   render: function() {
     var task = this.props.task;
     var action = this.props.action;
@@ -355,7 +343,7 @@ const Desire = React.createClass({
         <DesireList
           desireList={this.state.desireList}
           onClick={this.showEditModal.bind(this, 'edit')}/>
-        <DesireEdit
+        <DesireEditModal
           action={this.state.action}
           desire={this.state.desireEditing}
           onChange={this.handleChange}
@@ -408,7 +396,7 @@ const DesireNode = React.createClass({
     );
   }
 });
-const DesireEdit = React.createClass({
+const DesireEditModal = React.createClass({
   render: function() {
     var desire = this.props.desire;
     var action = this.props.action;
@@ -508,7 +496,7 @@ const Event = React.createClass({
           onClick={this.showEventModal}
           eventList={this.state.eventList}
         />
-        <EventView
+        <EventViewModal
           removeEvent={this.removeEvent}
           event={this.state.eventViewing}/>
       </div>
@@ -558,7 +546,7 @@ const EventNode = React.createClass({
     );
   }
 });
-const EventView = React.createClass({
+const EventViewModal = React.createClass({
   render: function() {
     var event = this.props.event;
     var date = (new Date(event.date)).format('yy-MM-dd hh:mm:ss');
@@ -588,6 +576,211 @@ const EventView = React.createClass({
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+});
+
+var clearUserEditModalMessage;
+const User = React.createClass({
+  getInitialState: function() {
+    return {
+      image: '',
+      nickname: ''
+    };
+  },
+  showEditModal: function() {
+    $('#user-edit-modal').modal('show');
+    clearUserEditModalMessage();
+  },
+  componentDidMount: function() {
+    this.loadFromServer();
+  },
+  loadFromServer: function() {
+    $.get('/api/user/get', function(user) {
+      this.setState({
+        nickname: user.nickname,
+        image: '/img/'+user.image
+      });
+    }.bind(this));
+  },
+  changeNickname: function(evt) {
+    var nickname = evt.target.value;
+    this.setState({nickname: nickname});
+    $.post('/api/user/nickname/edit',
+      {nickname: nickname},
+      this.loadFromServer);
+  } ,
+  render: function() {
+    return (
+      <div>
+        <UserInfo
+          image={this.state.image}
+          onClick={this.showEditModal}
+          nickname={this.state.nickname}
+          achievement={this.props.achievement}/>
+        <UserEditModal
+          changeNickname={this.changeNickname}
+          onUpdate={this.loadFromServer}
+          nickname={this.state.nickname}
+          image={this.state.image} />
+      </div>
+    );
+  }
+})
+const UserInfo = React.createClass({
+  render: function() {
+    return (
+      <div className="well well-lg">
+        <div className="media">
+          <div className="media-left">
+            <a href={emptyUrl} onClick={this.props.onClick}>
+              <img
+                className="media-object"
+                src={this.props.image}
+                style={{height: '150px', width: '150px'}}/>
+            </a>
+          </div>
+          <div className="media-body">
+            <br />
+            <h2 className="media-heading">{this.props.nickname}</h2>
+            <br />
+            <Achievement achievement={this.props.achievement}/>
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+const Achievement = React.createClass({
+  render: function() {
+    var achievement = this.props.achievement;
+    var state = (achievement >= 0)? 'success': 'danger';
+    return (
+      <h2 className={'text-'+state}>
+        <strong>Achievement: {this.props.achievement}</strong>
+      </h2>
+    );
+  }
+});
+const UserEditModal = React.createClass({
+  getInitialState() {
+    return {
+      state: 'success',
+      message: ''
+    };
+  },
+  setMessage: function(msg) {
+    this.setState(msg);
+  },
+  render: function() {
+    var state = this.state.state;
+    var message = this.state.message;
+    clearUserEditModalMessage = function() {
+      this.setState({message: ''});
+    }.bind(this);
+    return (
+      <div className="modal fade" id="user-edit-modal">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <h4 className="modal-title">User Info</h4>
+            </div>
+            <div className="modal-body">
+              {message?<div className={'alert alert-'+state}>{message}</div>: ''}
+              <form className="form-horizontal">
+                <div className="form-group">
+                  <label htmlFor="nickname-input" className="col-sm-3 control-label">Nickname</label>
+                  <div className="col-sm-4">
+                    <TextInput
+                      name="nickname"
+                      default={this.props.nickname}
+                      onChange={this.props.changeNickname}/>
+                  </div>
+                </div>
+              </form>
+              <hr />
+              <UserImageUpload
+                image={this.props.image}
+                setMessage={this.setMessage}
+                onUpdate={this.props.onUpdate}/>
+            </div>
+            <div className="modal-footer">
+              <a className="btn btn-danger" type="button" href="/logout">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+const UserImageUpload = React.createClass({
+  getInitialState: function() {
+    return {
+      image: null,
+      changed: false
+    };
+  },
+  handleImageChange: function(files) {
+    this.setState({
+      image: files? files[0]: null,
+      changed: true
+    });
+  },
+  uploadImage: function() {
+    if (!this.state.changed) return;
+    if (this.state.image.size > 2*1024*1024) {
+      this.props.setMessage({
+        state: 'danger',
+        message: 'File should be smaller than 2MB'
+      });
+      return;
+    }
+    var data = new FormData();
+    data.append('image', this.state.image);
+    $.ajax({
+      type: 'post',
+      url: '/api/user/picture/upload',
+      data: data,
+      enctype: 'multipart/form-data',
+      processData: false,
+      contentType: false,
+      success: function() {
+        this.props.onUpdate();
+        this.setState({changed: false});
+        this.props.setMessage({
+          state: 'success',
+          message: 'Upload image success'
+        })
+      }.bind(this)
+    });
+  },
+  render: function() {
+    return (
+      <div className="row">
+        <div className="col-sm-3">
+          <img className="pull-right" src={this.props.image} style={{height: '80px', width: '80px'}}/>
+        </div>
+        <div className="col-sm-9">
+          <label htmlFor="picture-input">Upload new picture</label>
+          <form className="form-inline">
+            <div className="form-group">
+              <FileInput
+                name="picture"
+                accept="image/*"
+                onChange={this.handleImageChange}/>
+            </div>
+            <div className="form-group">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={this.uploadImage}>Upload</button>
+            </div>
+          </form>
         </div>
       </div>
     );

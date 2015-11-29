@@ -6,7 +6,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
-  username: { type: String, index: {unique: true}},
+  username: {type: String, index: {unique: true}},
+  nickname: String,
+  image: {type: String, default: 'default.png'},
   password: String,
   task: [Schema.Types.ObjectId],
   desire: [{
@@ -23,6 +25,12 @@ var userSchema = new Schema({
 userSchema.virtual('achievement').get(function() {
   var points = this.event.map((evt)=>evt.points);
   return (points.length)? points.reduce((a, b)=>a+b): 0;
+});
+userSchema.pre('save', function(next) {
+  if (!this.nickname) {
+    this.nickname = this.username;
+  }
+  next();
 });
 
 userSchema.methods.addTask = function addTask(task, callback) {
@@ -89,6 +97,7 @@ userSchema.methods.removeEvent = function removeEvent(event, callback) {
   this.event.remove(event._id);
   this.save(callback);
 };
+
 userSchema.set('toJSON', {virtuals: true});
 userSchema.set('toObject', {virtuals: true});
 var User = mongoose.model('User', userSchema);
