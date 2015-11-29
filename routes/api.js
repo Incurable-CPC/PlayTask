@@ -155,7 +155,7 @@ router.get('/user/get', function(req, res, next) {
     })
   });
 });
-router.post('/user/picture/update', upload.single('image'), function(req, res, next) {
+router.post('/user/picture/upload', upload.single('image'), function(req, res, next) {
   var image = req.file;
   fs.readFile(image.path, function(err, data) {
     if (err) return next(err);
