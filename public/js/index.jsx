@@ -610,7 +610,7 @@ const User = React.createClass({
     this.setState({nickname: nickname});
     $.post('/api/user/nickname/edit',
       {nickname: nickname},
-      this.loadFromServer);
+      function() {});
   } ,
   render: function() {
     return (
