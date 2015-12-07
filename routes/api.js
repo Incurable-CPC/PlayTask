@@ -56,7 +56,9 @@ router.post('/task/new', function(req, res, next) {
 });
 router.post('/task/edit', function(req, res, next) {
   var task = JSON.parse(req.body.task);
-  Task.findByIdAndUpdate(task._id, task, function(err, task) {
+  var id = task._id;
+  delete task._id;
+  Task.findByIdAndUpdate(id, task, function(err, task) {
     if (err) return next(err);
     res.send(task);
   });
